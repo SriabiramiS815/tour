@@ -1,0 +1,7 @@
+{
+  "name": "Sri Tours Assistant",
+  "description": "AI-powered tourism assistant for Sri Tours featuring real-time voice and text interaction.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
