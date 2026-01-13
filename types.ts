@@ -17,13 +17,17 @@ export interface Booking {
   customerName: string;
   customerMobile: string;
   customerEmail: string;
+  transportType?: string;
+  hotelRating?: string;
+  numTravelers?: number;
   status: 'confirmed' | 'pending';
   timestamp: Date;
 }
 
 export enum AppView {
   HOME = 'HOME',
-  ASSISTANT = 'ASSISTANT'
+  ASSISTANT = 'ASSISTANT',
+  CATEGORY = 'CATEGORY'
 }
 
 export enum AgentMode {

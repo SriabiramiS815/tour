@@ -60,6 +60,9 @@ app.post('/api/create-booking', async (req, res) => {
     duration,
     package_type,
     travel_date,
+    num_travelers,
+    transport_type,
+    hotel_rating,
     customer_name,
     customer_mobile,
     customer_email
@@ -77,6 +80,9 @@ app.post('/api/create-booking', async (req, res) => {
         duration,
         package_type,
         travel_date,
+        num_travelers,
+        transport_type,
+        hotel_rating,
         customer_name,
         customer_mobile,
         customer_email,
@@ -105,8 +111,11 @@ TRIP DETAILS:
 ----------------------------------------
 Destination: ${destination}
 Duration: ${duration}
+Travelers: ${num_travelers || 2}
 Package: ${package_type}
 Start Date: ${travel_date}
+Transport: ${transport_type || 'None'}
+Hotel: ${hotel_rating || '3 Star'}
 ----------------------------------------
 
 Our travel expert will contact you shortly at ${customer_mobile} to finalize the itinerary details.
@@ -127,8 +136,10 @@ Sri Tours Team
             .header h1 { margin: 0; font-size: 24px; font-weight: 300; letter-spacing: 1px; }
             .content { padding: 30px; background-color: #ffffff; }
             .booking-box { background-color: #f0fdf4; border: 1px solid #bbf7d0; padding: 20px; border-radius: 6px; margin: 20px 0; }
-            .booking-item { margin-bottom: 10px; }
-            .label { font-weight: bold; color: #0f766e; width: 100px; display: inline-block; }
+            .booking-item { margin-bottom: 10px; display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding-bottom: 5px; }
+            .booking-item:last-child { border-bottom: none; }
+            .label { font-weight: bold; color: #0f766e; }
+            .value { font-weight: 500; }
             .footer { background-color: #f8fafc; padding: 20px; text-align: center; font-size: 12px; color: #64748b; }
           </style>
         </head>
@@ -143,10 +154,13 @@ Sri Tours Team
               <p>We are thrilled to confirm your booking with Sri Tours. Your adventure awaits!</p>
               
               <div class="booking-box">
-                <div class="booking-item"><span class="label">Destination:</span> ${destination}</div>
-                <div class="booking-item"><span class="label">Duration:</span> ${duration}</div>
-                <div class="booking-item"><span class="label">Package:</span> ${package_type}</div>
-                <div class="booking-item"><span class="label">Date:</span> ${travel_date}</div>
+                <div class="booking-item"><span class="label">Destination:</span> <span class="value">${destination}</span></div>
+                <div class="booking-item"><span class="label">Duration:</span> <span class="value">${duration} days</span></div>
+                <div class="booking-item"><span class="label">Date:</span> <span class="value">${travel_date}</span></div>
+                <div class="booking-item"><span class="label">Travelers:</span> <span class="value">${num_travelers || 2}</span></div>
+                <div class="booking-item"><span class="label">Package:</span> <span class="value">${package_type}</span></div>
+                <div class="booking-item"><span class="label">Transport:</span> <span class="value">${transport_type || 'None'}</span></div>
+                <div class="booking-item"><span class="label">Hotel:</span> <span class="value">${hotel_rating || '3 Star'}</span></div>
               </div>
 
               <p>Our travel expert will be in touch with you at <strong>${customer_mobile}</strong> shortly to handle the finer details.</p>

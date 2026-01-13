@@ -3,13 +3,15 @@ import { AppView, AgentMode, Destination } from './types';
 import { ChatAgent } from './components/ChatAgent';
 import { VoiceAgent } from './components/VoiceAgent';
 import { HomeView } from './components/HomeView';
+import { CategoryPage } from './components/CategoryPage';
 
 const API_KEY = process.env.API_KEY || '';
 
 function App() {
   const [currentView, setCurrentView] = useState<AppView>(AppView.HOME);
-  const [agentMode, setAgentMode] = useState<AgentMode>(AgentMode.CHAT);
+  const [agentMode, setAgentMode] = useState<AgentMode>(AgentMode.VOICE);
   const [initialPrompt, setInitialPrompt] = useState<string | undefined>(undefined);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   // Handle "Plan this" click from Home Page
@@ -25,6 +27,11 @@ function App() {
     setAgentMode(AgentMode.CHAT);
   }
 
+  const handleCategorySelect = (category: string) => {
+    setSelectedCategory(category);
+    setCurrentView(AppView.CATEGORY);
+  };
+
   if (!API_KEY) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-100 p-4">
@@ -38,7 +45,7 @@ function App() {
 
   return (
     <div className={`flex flex-col h-screen w-full bg-slate-50 dark:bg-slate-950 overflow-hidden font-sans transition-colors duration-300 ${isDarkMode ? 'dark' : ''}`}>
-      
+
       {/* Top Header / Navigation */}
       <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 py-3 flex items-center justify-between shrink-0 z-20 shadow-sm relative transition-colors">
         <div className="flex items-center space-x-2">
@@ -54,19 +61,19 @@ function App() {
         <div className="flex items-center space-x-3">
           {/* Tab Switcher */}
           <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-full transition-colors">
-             <button 
-               onClick={() => setCurrentView(AppView.HOME)}
-               className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${currentView === AppView.HOME ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}
-             >
-               Discover
-             </button>
-             <button 
-               onClick={() => setCurrentView(AppView.ASSISTANT)}
-               className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all flex items-center space-x-1 ${currentView === AppView.ASSISTANT ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}
-             >
-               <span>Assistant</span>
-               <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
-             </button>
+            <button
+              onClick={() => setCurrentView(AppView.HOME)}
+              className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${currentView === AppView.HOME ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}
+            >
+              Discover
+            </button>
+            <button
+              onClick={() => setCurrentView(AppView.ASSISTANT)}
+              className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all flex items-center space-x-1 ${currentView === AppView.ASSISTANT ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}
+            >
+              <span>Assistant</span>
+              <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+            </button>
           </div>
 
           {/* Dark Mode Toggle */}
@@ -90,50 +97,71 @@ function App() {
 
       {/* Main Content */}
       <main className="flex-1 relative overflow-hidden">
-        
+
         {/* Home View */}
         {currentView === AppView.HOME && (
-           <HomeView onPlanTrip={handlePlanTrip} onGeneralInquiry={handleGeneralInquiry} />
+          <HomeView
+            onPlanTrip={handlePlanTrip}
+            onGeneralInquiry={handleGeneralInquiry}
+            onCategorySelect={handleCategorySelect}
+            onVoiceInquiry={() => {
+              setInitialPrompt(undefined);
+              setCurrentView(AppView.ASSISTANT);
+              setAgentMode(AgentMode.VOICE);
+            }}
+          />
+        )}
+
+        {/* Category Page View */}
+        {currentView === AppView.CATEGORY && selectedCategory && (
+          <CategoryPage
+            category={selectedCategory}
+            onBack={() => setCurrentView(AppView.HOME)}
+            onSearch={(details) => {
+              setInitialPrompt(details);
+              setCurrentView(AppView.ASSISTANT);
+              setAgentMode(AgentMode.CHAT);
+            }}
+          />
         )}
 
         {/* Agent View */}
         {currentView === AppView.ASSISTANT && (
           <div className="h-full flex flex-col">
-            
+
             {/* Mode Toggle (Chat / Voice) */}
             <div className="bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 px-6 py-2 flex justify-center shrink-0 transition-colors">
-               <div className="relative bg-slate-100 dark:bg-slate-800 rounded-full p-1 flex w-48 h-10 shadow-inner transition-colors">
-                  <div 
-                    className={`absolute top-1 bottom-1 w-[calc(50%-4px)] bg-white dark:bg-slate-600 rounded-full shadow-sm transition-all duration-300 ease-out ${
-                      agentMode === AgentMode.CHAT ? 'left-1' : 'left-[calc(50%+2px)]'
+              <div className="relative bg-slate-100 dark:bg-slate-800 rounded-full p-1 flex w-48 h-10 shadow-inner transition-colors">
+                <div
+                  className={`absolute top-1 bottom-1 w-[calc(50%-4px)] bg-white dark:bg-slate-600 rounded-full shadow-sm transition-all duration-300 ease-out ${agentMode === AgentMode.CHAT ? 'left-1' : 'left-[calc(50%+2px)]'
                     }`}
-                  ></div>
-                  <button 
-                    onClick={() => setAgentMode(AgentMode.CHAT)}
-                    className={`flex-1 relative z-10 flex items-center justify-center text-sm font-semibold transition-colors ${agentMode === AgentMode.CHAT ? 'text-teal-700 dark:text-teal-400' : 'text-slate-500 dark:text-slate-400'}`}
-                  >
-                    Chat
-                  </button>
-                  <button 
-                    onClick={() => setAgentMode(AgentMode.VOICE)}
-                     className={`flex-1 relative z-10 flex items-center justify-center text-sm font-semibold transition-colors ${agentMode === AgentMode.VOICE ? 'text-indigo-700 dark:text-indigo-400' : 'text-slate-500 dark:text-slate-400'}`}
-                  >
-                    Voice
-                  </button>
-               </div>
+                ></div>
+                <button
+                  onClick={() => setAgentMode(AgentMode.CHAT)}
+                  className={`flex-1 relative z-10 flex items-center justify-center text-sm font-semibold transition-colors ${agentMode === AgentMode.CHAT ? 'text-teal-700 dark:text-teal-400' : 'text-slate-500 dark:text-slate-400'}`}
+                >
+                  Chat
+                </button>
+                <button
+                  onClick={() => setAgentMode(AgentMode.VOICE)}
+                  className={`flex-1 relative z-10 flex items-center justify-center text-sm font-semibold transition-colors ${agentMode === AgentMode.VOICE ? 'text-indigo-700 dark:text-indigo-400' : 'text-slate-500 dark:text-slate-400'}`}
+                >
+                  Voice
+                </button>
+              </div>
             </div>
 
             {/* Container for Agents */}
             <div className="flex-1 overflow-hidden relative bg-slate-50 dark:bg-slate-950 transition-colors">
-               {agentMode === AgentMode.CHAT ? (
-                 <ChatAgent apiKey={API_KEY} initialMessage={initialPrompt} key="chat-agent" />
-               ) : (
-                 <div className="h-full p-4 flex items-center justify-center">
-                   <div className="w-full h-full max-w-lg rounded-3xl overflow-hidden shadow-2xl ring-1 ring-slate-900/5 dark:ring-slate-100/10">
-                     <VoiceAgent apiKey={API_KEY} key="voice-agent" />
-                   </div>
-                 </div>
-               )}
+              {agentMode === AgentMode.CHAT ? (
+                <ChatAgent apiKey={API_KEY} initialMessage={initialPrompt} key="chat-agent" />
+              ) : (
+                <div className="h-full p-4 flex items-center justify-center">
+                  <div className="w-full h-full max-w-lg rounded-3xl overflow-hidden shadow-2xl ring-1 ring-slate-900/5 dark:ring-slate-100/10">
+                    <VoiceAgent apiKey={API_KEY} key="voice-agent" />
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}

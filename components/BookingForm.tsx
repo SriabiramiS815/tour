@@ -11,6 +11,9 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSubmit, initialDesti
         destination: initialDestination,
         duration: '',
         packageType: 'Standard',
+        transportType: 'None',
+        hotelRating: '3 Star',
+        numTravelers: '2',
         travelDate: '',
         customerName: '',
         customerMobile: '',
@@ -79,19 +82,64 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSubmit, initialDesti
                     </div>
                 </div>
 
-                <div>
-                    <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Package Type</label>
-                    <div className="flex bg-slate-100 dark:bg-slate-900 rounded-lg p-1">
-                        {['Budget', 'Standard', 'Premium'].map((type) => (
-                            <button
-                                key={type}
-                                type="button"
-                                onClick={() => setFormData(prev => ({ ...prev, packageType: type }))}
-                                className={`flex-1 text-xs py-1.5 rounded-md transition-all ${formData.packageType === type ? 'bg-white dark:bg-slate-700 shadow-sm text-teal-600 dark:text-teal-400 font-medium' : 'text-slate-500 dark:text-slate-400'}`}
-                            >
-                                {type}
-                            </button>
-                        ))}
+                <div className="grid grid-cols-2 gap-3">
+                    <div>
+                        <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Travelers</label>
+                        <input
+                            required
+                            type="number"
+                            min="1"
+                            name="numTravelers"
+                            value={formData.numTravelers}
+                            onChange={handleChange}
+                            className="w-full text-sm px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none transition-all"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Transport</label>
+                        <select
+                            name="transportType"
+                            value={formData.transportType}
+                            onChange={handleChange}
+                            className="w-full text-sm px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none transition-all"
+                        >
+                            <option value="None">None</option>
+                            <option value="Flight">Flight</option>
+                            <option value="Train">Train</option>
+                            <option value="Bus">Bus</option>
+                            <option value="Cab">Cab</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                    <div>
+                        <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Hotel Rating</label>
+                        <select
+                            name="hotelRating"
+                            value={formData.hotelRating}
+                            onChange={handleChange}
+                            className="w-full text-sm px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none transition-all"
+                        >
+                            <option value="3 Star">3 Star</option>
+                            <option value="4 Star">4 Star</option>
+                            <option value="5 Star">5 Star</option>
+                            <option value="Resort">Resort</option>
+                            <option value="Homestay">Homestay</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Package Type</label>
+                        <select
+                            name="packageType"
+                            value={formData.packageType}
+                            onChange={handleChange}
+                            className="w-full text-sm px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none transition-all"
+                        >
+                            <option value="Budget">Budget</option>
+                            <option value="Standard">Standard</option>
+                            <option value="Premium">Premium</option>
+                        </select>
                     </div>
                 </div>
 

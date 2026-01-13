@@ -38,6 +38,7 @@ export const ChatAgent: React.FC<ChatAgentProps> = ({ apiKey, initialMessage }) 
           config: {
             systemInstruction: SYSTEM_INSTRUCTION,
             tools: [{ functionDeclarations: TOOLS }],
+            generationConfig: { temperature: 0.4 },
           },
         });
         setChatSession(session);
@@ -143,15 +144,18 @@ export const ChatAgent: React.FC<ChatAgentProps> = ({ apiKey, initialMessage }) 
           }
         }
 
+        // IMPORTANT: Must include the 'id' of the function call in the response
         return {
           functionResponse: {
             name: fc.name,
+            id: fc.id, // Include the ID from the call
             response: responseData
           }
         };
       }));
 
       // Send tool results back to the model
+      console.log("Sending function responses:", functionResponses);
       currentResult = await chatSession.sendMessage(functionResponses);
     }
 

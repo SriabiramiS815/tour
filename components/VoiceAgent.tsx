@@ -88,6 +88,7 @@ export const VoiceAgent: React.FC<VoiceAgentProps> = ({ apiKey }) => {
           responseModalities: [Modality.AUDIO],
           systemInstruction: SYSTEM_INSTRUCTION,
           tools: [{ functionDeclarations: TOOLS }],
+          generationConfig: { temperature: 0.4 },
           speechConfig: {
             voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } },
           },
@@ -99,9 +100,39 @@ export const VoiceAgent: React.FC<VoiceAgentProps> = ({ apiKey }) => {
             setIsConnecting(false);
             addLog("Connected. Speak now!");
 
+            // Trigger the greeting protocol
+            const aiSession = currentAi.live;
+            // We can't directly send text to the Live API easily in this SDK version without a workaroud, 
+            // but the system instruction is the primary driver. 
+            // However, to ensure it speaks *first*, we can send a small 'clientContent' trigger if supported, 
+            // or rely on the system instruction. 
+            // Since the user wants the AGENT to speak first, we will try to rely on the System Instruction.
+            // If that fails, we can implement a 'fake' initial user message if the SDK allows.
+
+            // In many Live API implementations, the model waits for user input.
+            // To force a hello, we can try sending a text input pretending to be the system or a trigger.
+            // But for now, let's assume the System Instruction + the user saying "Hello" is the standard flow,
+            // OR usually the "hello" comes from the Client handling the connection event.
+
+            // BETTER APPROACH: We can just use the standard TTS to play a welcome message LOCALLY if we want 100% reliability,
+            // but to use the AI's voice, we need to prompt it.
+
+            // Let's send a silent "start conversation" signal if possible. 
+            // For this specific google-genai SDK, sending text input is:
+            // session.send({ clientContent: { turns: [{ role: 'user', parts: [{ text: 'Hello, please start.' }] }] } });
+            // We will try that below inside the session promise.
+
+            // Note: We access session via logic below
+
+
             const inputCtx = new AudioContextClass({ sampleRate: 16000 });
             const source = inputCtx.createMediaStreamSource(stream);
             const processor = inputCtx.createScriptProcessor(4096, 1, 1);
+
+            // Trigger the greeting ONCE when connected
+            sessionPromise.then(session => {
+              (session as any).send({ parts: [{ text: "System Event: User has connected. Please greet them according to your protocol." }], role: "user" });
+            });
 
             processor.onaudioprocess = (e) => {
               if (!sessionRef.current) return;
